@@ -26,7 +26,7 @@ if os.getenv('RENDER'):
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///chatbot.db'
 else:
     # 本地環境使用 SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chatbot.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chatbot.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -284,51 +284,51 @@ def uploaded_file(filename):
 @app.route('/api/chat', methods=['POST'])
 def chat():
     try:
-        data = request.get_json()
-        user_message = data.get('message', '').strip()
-        if not user_message:
-            return jsonify({'error': '請輸入訊息'}), 400
-        if 'session_id' not in session:
-            session['session_id'] = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        session_id = session['session_id']
-
+    data = request.get_json()
+    user_message = data.get('message', '').strip()
+    if not user_message:
+        return jsonify({'error': '請輸入訊息'}), 400
+    if 'session_id' not in session:
+        session['session_id'] = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    session_id = session['session_id']
+    
         # 直接讓 GPT 做 FAQ 分類與比對
         faq_match = gpt_faq_search(user_message)
-
-        if faq_match:
+    
+    if faq_match:
             bot_response = faq_match['answer']
             bot_response_html = faq_match['answer_html']
             response_source = faq_match['source']
             category = faq_match['category']
             images = None
             related_options = faq_match.get('related_options', [])
-        else:
+    else:
             bot_response = "抱歉，AI 回答失敗。"
             bot_response_html = bot_response
-            response_source = "GPT AI"
+        response_source = "GPT AI"
             category = "一般對話"
             images = None
             related_options = []
-
-        # 儲存聊天記錄
-        chat_record = ChatHistory(
-            session_id=session_id,
-            user_message=user_message,
+    
+    # 儲存聊天記錄
+    chat_record = ChatHistory(
+        session_id=session_id,
+        user_message=user_message,
             bot_response=bot_response,
             bot_response_html=bot_response_html
-        )
-        db.session.add(chat_record)
-        db.session.commit()
-
-        return jsonify({
-            'response': bot_response,
+    )
+    db.session.add(chat_record)
+    db.session.commit()
+    
+    return jsonify({
+        'response': bot_response,
             'response_html': bot_response_html,
-            'source': response_source,
+        'source': response_source,
             'category': category,
             'images': images,
             'related_options': related_options,
-            'timestamp': datetime.now().isoformat()
-        })
+        'timestamp': datetime.now().isoformat()
+    })
     except Exception as e:
         print('API /api/chat 發生錯誤:', e)
         import traceback

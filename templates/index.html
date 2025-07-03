@@ -618,8 +618,8 @@
                 sendButton.disabled = false;
                 addMessage('抱歉，連線發生錯誤，請稍後再試。', 'bot');
                 console.error('Error:', error);
-            });
-        }
+        });
+}
 
         // 添加訊息到聊天介面
         function addMessage(content, sender, metadata = {}) {
@@ -729,7 +729,7 @@
                 categoryDiv.className = 'message-category';
                 categoryDiv.textContent = metadata.category;
                 contentDiv.appendChild(categoryDiv);
-            }
+        }
 
             messageDiv.appendChild(contentDiv);
             chatMessages.appendChild(messageDiv);
@@ -743,7 +743,7 @@
                         e.stopPropagation();
                         document.getElementById('modalImg').src = this.src;
                         document.getElementById('imgModal').classList.add('active');
-                    };
+};
                 });
             }, 0);
             // =============================
