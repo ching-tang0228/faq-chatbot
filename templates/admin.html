@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ 管理介面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .back-link {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border: 1px solid white;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: white;
+            color: #4facfe;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .faq-list {
+            margin-top: 30px;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .faq-category {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .faq-answer {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .faq-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .image-upload {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload:hover {
+            border-color: #667eea;
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .upload-label:hover {
+            color: #5a67d8;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .markdown-help {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .markdown-help h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .markdown-help code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .markdown-help ul {
+            margin-left: 20px;
+        }
+
+        .markdown-help li {
+            margin: 5px 0;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .faq-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .faq-actions {
+                flex-direction: column;
+            }
+            
+            .back-link {
+                position: static;
+                transform: none;
+                display: inline-block;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-link">← 返回聊天</a>
+            <h1>📚 FAQ 管理介面</h1>
+            <p>管理常見問題與答案，支援 Markdown 格式和圖片</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-section">
+                <h3>➕ 新增 FAQ</h3>
+                <form id="faqForm">
+                    <div class="form-group">
+                        <label for="question">問題：</label>
+                        <input type="text" id="question" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="answer">答案（支援 Markdown 格式）：</label>
+                        <textarea id="answer" class="form-control" required></textarea>
+                        <div class="markdown-help">
+                            <h4>📝 Markdown 格式說明：</h4>
+                            <ul>
+                                <li><strong>粗體文字</strong>：使用 <code>**文字**</code></li>
+                                <li><em>斜體文字</em>：使用 <code>*文字*</code></li>
+                                <li>標題：使用 <code># 標題</code>、<code>## 子標題</code></li>
+                                <li>列表：使用 <code>- 項目</code> 或 <code>1. 項目</code></li>
+                                <li>圖片：使用 <code>![說明](圖片路徑)</code></li>
+                                <li>連結：使用 <code>[文字](網址)</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">分類：</label>
+                        <input type="text" id="category" class="form-control" value="一般" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="keywords">關鍵字（用逗號分隔）：</label>
+                        <input type="text" id="keywords" class="form-control" placeholder="例如：照護, 產品, 使用說明">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>圖片上傳：</label>
+                        <div class="image-upload">
+                            <input type="file" id="imageUpload" accept="image/*" multiple>
+                            <label for="imageUpload" class="upload-label">
+                                📷 點擊上傳圖片（可多選）
+                            </label>
+                            <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                                支援 JPG、PNG、GIF 格式，最大 16MB
+                            </p>
+                        </div>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">新增 FAQ</button>
+                </form>
+            </div>
+            
+            <div class="faq-list">
+                <h3>📋 現有 FAQ 列表</h3>
+                <div id="faqList">
+                    <p style="text-align: center; color: #666; padding: 40px;">
+                        載入中...
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImages = [];
+
+        // 載入 FAQ 列表
+        function loadFAQs() {
+            fetch('/api/faq')
+                .then(response => response.json())
+                .then(faqs => {
+                    const faqList = document.getElementById('faqList');
+                    
+                    if (faqs.length === 0) {
+                        faqList.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">目前沒有 FAQ</p>';
+                        return;
+                    }
+                    
+                    faqList.innerHTML = '';
+                    faqs.forEach(faq => {
+                        const faqDiv = document.createElement('div');
+                        faqDiv.className = 'faq-item';
+                        faqDiv.innerHTML = `
+                            <div class="faq-header">
+                                <div class="faq-question">${faq.question}</div>
+                                <div class="faq-category">${faq.category}</div>
+                            </div>
+                            <div class="faq-answer">${faq.answer}</div>
+                            <div class="faq-actions">
+                                <button class="btn btn-danger" onclick="deleteFAQ(${faq.id})">刪除</button>
+                            </div>
+                        `;
+                        faqList.appendChild(faqDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('載入 FAQ 失敗:', error);
+                    document.getElementById('faqList').innerHTML = 
+                        '<p style="text-align: center; color: #dc3545; padding: 40px;">載入失敗</p>';
+                });
+        }
+
+        // 刪除 FAQ
+        function deleteFAQ(id) {
+            if (!confirm('確定要刪除這個 FAQ 嗎？')) return;
+            
+            fetch(`/api/faq/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert('FAQ 刪除成功！', 'success');
+                loadFAQs();
+            })
+            .catch(error => {
+                console.error('刪除失敗:', error);
+                showAlert('刪除失敗，請稍後再試', 'error');
+            });
+        }
+
+        // 圖片上傳處理
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            
+            files.forEach(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('圖片上傳失敗：' + data.error, 'error');
+                    } else {
+                        uploadedImages.push(data.url);
+                        updateImagePreview();
+                        showAlert('圖片上傳成功！', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('上傳失敗:', error);
+                    showAlert('圖片上傳失敗，請稍後再試', 'error');
+                });
+            });
+        });
+
+        // 更新圖片預覽
+        function updateImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            uploadedImages.forEach((imageUrl, index) => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-item';
+                imageDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="上傳的圖片">
+                    <button class="image-remove" onclick="removeImage(${index})">×</button>
+                `;
+                preview.appendChild(imageDiv);
+            });
+        }
+
+        // 移除圖片
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        // 表單提交
+        document.getElementById('faqForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                question: document.getElementById('question').value,
+                answer: document.getElementById('answer').value,
+                category: document.getElementById('category').value,
+                keywords: document.getElementById('keywords').value,
+                images: JSON.stringify(uploadedImages)
+            };
+            
+            fetch('/api/faq', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert('FAQ 新增成功！', 'success');
+                
+                // 清空表單
+                document.getElementById('faqForm').reset();
+                uploadedImages = [];
+                updateImagePreview();
+                
+                // 重新載入 FAQ 列表
+                loadFAQs();
+            })
+            .catch(error => {
+                console.error('新增失敗:', error);
+                showAlert('新增失敗，請稍後再試', 'error');
+            });
+        });
+
+        // 顯示提示訊息
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const content = document.querySelector('.content');
+            content.insertBefore(alertDiv, content.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFAQs();
+        });
+    </script>
+</body>
+</html> 

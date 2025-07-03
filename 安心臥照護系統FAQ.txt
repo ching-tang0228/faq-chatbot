@@ -1,0 +1,11 @@
+cd C:\Users\User\Desktop\安心臥照護系統FAQ
+
+venv\Scripts\activate
+
+python chatbot_app.py
+
+python faq_import_and_check.py
+
+http://127.0.0.1:5000
+
+http://127.0.0.1:5000/admin

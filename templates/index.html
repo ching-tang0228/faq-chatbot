@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安心臥照護系統 - 智能客服</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .header-btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            gap: 8px;
+        }
+
+        .admin-link {
+            margin: 0;
+        }
+
+        .new-chat-btn {
+            background: #f3f4f6;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            margin: 0;
+        }
+
+        .new-chat-btn:hover {
+            background: #e0e7ef;
+            color: #222;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .message-source {
+            font-size: 12px;
+            color: #007bff;
+            margin-top: 5px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            background: #e3f2fd;
+        }
+
+        .message-source.faq {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .message-source.gpt {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .message-category {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 2px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+            background: #f8f9fa;
+            margin-left: 8px;
+        }
+
+        .message-images {
+            margin-top: 10px;
+        }
+
+        .message-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin-top: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+            min-width: 80px;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .faq-preview {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .faq-preview h4 {
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+
+        .faq-preview p {
+            color: #424242;
+            font-size: 14px;
+        }
+
+        /* Markdown 樣式 */
+        .markdown-content {
+            line-height: 1.6;
+        }
+
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            margin: 15px 0 10px 0;
+            color: #333;
+        }
+
+        .markdown-content p {
+            margin: 10px 0;
+        }
+
+        .markdown-content ul, .markdown-content ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .markdown-content li {
+            margin: 5px 0;
+        }
+
+        .markdown-content code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .markdown-content pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+            margin: 15px 0;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                margin: 10px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .admin-link {
+                position: static;
+                transform: none;
+                display: inline-block;
+                margin-top: 10px;
+            }
+        }
+
+        .clear-chat-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .clear-chat-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* 相關選項樣式 */
+        .related-options {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .related-options h4 {
+            font-size: 14px;
+            color: #495057;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .option-button {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            text-decoration: none;
+            display: block;
+        }
+
+        .option-button:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+            transform: translateY(-1px);
+        }
+
+        .option-button.faq-option {
+            border-left: 3px solid #28a745;
+        }
+
+        .option-button.faq-option.same-category {
+            border-left: 3px solid #dc3545;
+            background: #fff5f5;
+            font-weight: 600;
+        }
+
+        .option-button.faq-option.same-category:hover {
+            background: #ffe6e6;
+        }
+
+        .option-button.link-option {
+            border-left: 3px solid #007bff;
+            color: #007bff;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .img-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .img-modal img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 0 20px #000;
+        }
+        .img-modal.active { display: flex; }
+
+        .chat-message {
+            overflow-x: auto;
+        }
+        .chat-message img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .img-lightbox-overlay {
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-lightbox-content {
+            position: relative;
+        }
+        .img-lightbox-overlay img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.3);
+            background: #fff;
+        }
+        .img-lightbox-close {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            background: #fff;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            border: none;
+        }
+        .img-scroll-box {
+            overflow-x: auto;
+            max-width: 100%;
+            margin: 8px 0;
+        }
+        .img-scroll-box img {
+            display: block;
+            max-width: none;
+            height: auto;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .chat-messages, .message-bot, .message-user {
+            overflow-x: visible !important;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 安心臥照護系統</h1>
+            <p>智能客服機器人 - 為您提供專業的照護諮詢服務</p>
+            <div class="header-btn-group">
+                <a href="/admin" class="admin-link">管理介面</a>
+                <button id="clearChatBtn" class="new-chat-btn">New chat</button>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    <div class="markdown-content">
+                        您好！我是安心臥照護系統的智能客服機器人 🤖<br><br>
+                        我可以協助您：<br>
+                        • 回答照護相關問題<br>
+                        • 提供產品使用說明<br>
+                        • 處理一般諮詢服務<br>
+                        • 進行日常對話交流<br><br>
+                        請輸入您的問題，我會盡力為您服務！
+                    </div>
+                    <div class="message-time">現在</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+            <p>正在思考中...</p>
+        </div>
+        
+        <div class="chat-input">
+            <div class="input-container">
+                <textarea 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="請輸入您的問題..."
+                    rows="1"
+                ></textarea>
+                <button id="sendButton" class="send-button">發送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 圖片放大 Modal -->
+    <div id="imgModal" class="img-modal" onclick="this.classList.remove('active')">
+      <img id="modalImg" src="" alt="放大圖片">
+</div>
+
+<script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const loading = document.getElementById('loading');
+
+        // 自動調整輸入框高度
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // 載入聊天記錄
+        loadChatHistory();
+
+        // 發送訊息
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // 添加用戶訊息
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // 顯示載入狀態
+            loading.classList.add('show');
+            sendButton.disabled = true;
+
+            // 發送API請求
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.classList.remove('show');
+                sendButton.disabled = false;
+
+                if (data.error) {
+                    addMessage('抱歉，發生錯誤：' + data.error, 'bot');
+                } else {
+                    addMessage(data.response_html || data.response, 'bot', {
+                        source: data.source,
+                        category: data.category,
+                        images: data.images,
+                        related_options: data.related_options
+                    });
+                }
+            })
+            .catch(error => {
+                loading.classList.remove('show');
+                sendButton.disabled = false;
+                addMessage('抱歉，連線發生錯誤，請稍後再試。', 'bot');
+                console.error('Error:', error);
+            });
+        }
+
+        // 添加訊息到聊天介面
+        function addMessage(content, sender, metadata = {}) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            // 處理HTML內容
+            if (sender === 'bot' && content.includes('<')) {
+                contentDiv.innerHTML = `<div class="markdown-content">${content}</div>`;
+            } else {
+                contentDiv.innerHTML = `<div class="markdown-content">${escapeHtml(content)}</div>`;
+            }
+
+            // 添加圖片
+            if (metadata.images && metadata.images !== '[]') {
+                try {
+                    const images = JSON.parse(metadata.images);
+                    if (images.length > 0) {
+                        const imagesDiv = document.createElement('div');
+                        imagesDiv.className = 'message-images';
+                        images.forEach(imagePath => {
+                            const img = document.createElement('img');
+                            img.src = imagePath;
+                            img.className = 'message-image';
+                            img.alt = 'FAQ圖片';
+                            imagesDiv.appendChild(img);
+                        });
+                        contentDiv.appendChild(imagesDiv);
+                    }
+                } catch (e) {
+                    console.error('Error parsing images:', e);
+                }
+            }
+
+            // 添加相關選項
+            if (sender === 'bot' && metadata.related_options && metadata.related_options.length > 0) {
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'related-options';
+                
+                const optionsTitle = document.createElement('h4');
+                optionsTitle.textContent = '💡 您可能還想了解：';
+                optionsDiv.appendChild(optionsTitle);
+                
+                const optionsGrid = document.createElement('div');
+                optionsGrid.className = 'options-grid';
+                
+                metadata.related_options.forEach(option => {
+                    const optionButton = document.createElement(option.type === 'link' ? 'a' : 'button');
+                    optionButton.className = `option-button ${option.type === 'link' ? 'link-option' : 'faq-option'}`;
+                    
+                    // 如果是FAQ選項且來自相同分類，添加特殊樣式
+                    if (option.type === 'faq' && option.same_category) {
+                        optionButton.classList.add('same-category');
+                        optionButton.textContent = `📌 ${option.text}`;
+                    } else {
+                        optionButton.textContent = option.text;
+                    }
+                    
+                    if (option.type === 'link') {
+                        optionButton.href = option.url;
+                        optionButton.target = '_blank';
+                        optionButton.rel = 'noopener noreferrer';
+                    } else {
+                        optionButton.addEventListener('click', function() {
+                            messageInput.value = option.text;
+                            messageInput.focus();
+                        });
+                    }
+                    
+                    optionsGrid.appendChild(optionButton);
+                });
+                
+                optionsDiv.appendChild(optionsGrid);
+                contentDiv.appendChild(optionsDiv);
+            }
+
+            // 添加時間戳
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString('zh-TW');
+            contentDiv.appendChild(timeDiv);
+
+            // 添加來源和分類資訊
+            if (metadata.source) {
+                const sourceDiv = document.createElement('div');
+                sourceDiv.className = 'message-source';
+                
+                // 根據來源類型添加不同的樣式
+                if (metadata.source === 'FAQ資料庫' || metadata.source === 'FAQ回答') {
+                    sourceDiv.classList.add('faq');
+                    sourceDiv.textContent = '📚 FAQ資料庫';
+                } else if (metadata.source === 'GPT AI' || metadata.source === '一般對話') {
+                    sourceDiv.classList.add('gpt');
+                    sourceDiv.textContent = '🤖 GPT AI';
+        } else {
+                    sourceDiv.textContent = `來源：${metadata.source}`;
+                }
+                
+                contentDiv.appendChild(sourceDiv);
+            }
+
+            if (metadata.category) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'message-category';
+                categoryDiv.textContent = metadata.category;
+                contentDiv.appendChild(categoryDiv);
+            }
+
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // ====== 新增：圖片放大功能 ======
+            setTimeout(() => {
+                contentDiv.querySelectorAll('img.message-image').forEach(img => {
+                    img.style.cursor = 'zoom-in';
+                    img.onclick = function(e) {
+                        e.stopPropagation();
+                        document.getElementById('modalImg').src = this.src;
+                        document.getElementById('imgModal').classList.add('active');
+                    };
+                });
+            }, 0);
+            // =============================
+        }
+
+        // 載入聊天記錄
+        function loadChatHistory() {
+    fetch('/api/chat/history')
+                .then(response => response.json())
+        .then(history => {
+            history.forEach(record => {
+                        addMessage(record.user_message, 'user');
+                        addMessage(record.bot_response_html || record.bot_response, 'bot');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading chat history:', error);
+                });
+        }
+
+        // HTML轉義
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 事件監聽器
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 自動聚焦到輸入框
+        messageInput.focus();
+
+        document.getElementById('clearChatBtn').addEventListener('click', function() {
+            if (confirm('確定要清空本次對話紀錄嗎？')) {
+                fetch('/api/chat/clear', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        chatMessages.innerHTML = '';
+                        addMessage('您好！我是安心臥照護系統的智能客服機器人 🤖<br><br>我可以協助您：<br>• 回答照護相關問題<br>• 提供產品使用說明<br>• 處理一般諮詢服務<br>• 進行日常對話交流<br><br>請輸入您的問題，我會盡力為您服務！', 'bot');
+                    });
+            }
+        });
+
+        // 自動將所有 .chat-messages img 包裹在 .img-scroll-box
+        function wrapChatImages() {
+            document.querySelectorAll('.chat-messages img').forEach(img => {
+                if (!img.parentElement.classList.contains('img-scroll-box')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'img-scroll-box';
+                    img.parentElement.insertBefore(wrapper, img);
+                    wrapper.appendChild(img);
+                }
+            });
+        }
+        setInterval(wrapChatImages, 1000);
+
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'IMG' && e.target.closest('.img-scroll-box')) {
+                const src = e.target.src;
+                const overlay = document.createElement('div');
+                overlay.className = 'img-lightbox-overlay';
+                overlay.innerHTML = `
+                  <div class="img-lightbox-content">
+                    <button class="img-lightbox-close" title="關閉">&times;</button>
+                    <img src="${src}">
+                  </div>
+                `;
+                document.body.appendChild(overlay);
+                overlay.querySelector('.img-lightbox-close').onclick = () => overlay.remove();
+                overlay.onclick = (event) => {
+                  if (event.target === overlay) overlay.remove();
+                };
+            }
+        });
+</script>
+</body>
+</html> 
