@@ -63,6 +63,19 @@
             color: #4facfe;
         }
 
+        .admin-nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .admin-nav .btn {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+
         .content {
             padding: 30px;
         }
@@ -343,6 +356,15 @@
         </div>
         
         <div class="content">
+            <div class="admin-nav">
+                <a href="/admin" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> FAQ 管理
+                </a>
+                <a href="/logs-admin" class="btn btn-secondary">
+                    <i class="fas fa-chart-line"></i> 聊天記錄管理
+                </a>
+            </div>
+            
             <div class="form-section">
                 <h3>➕ 新增 FAQ</h3>
                 <form id="faqForm">

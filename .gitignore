@@ -31,7 +31,7 @@ ENV/
 .env.production
 
 # Database
-*.db
+# *.db
 *.sqlite
 *.sqlite3
 

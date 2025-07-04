@@ -1,0 +1,2 @@
+timestamp,user_question,bot_response,user_satisfaction,session_id,ip_address,response_source,category,processing_status
+2025-07-04 15:01:29,整合測試問題,整合測試回答,未評分,integration_test,127.0.0.1,測試,測試,pending

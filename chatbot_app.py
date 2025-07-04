@@ -11,6 +11,7 @@ import re
 import markdown
 from werkzeug.utils import secure_filename
 import heapq
+from chat_logger import chat_logger
 
 # 載入環境變數
 load_dotenv()
@@ -290,10 +291,10 @@ def chat():
         if 'session_id' not in session:
             session['session_id'] = f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         session_id = session['session_id']
-
+        
         # 直接讓 GPT 做 FAQ 分類與比對
         faq_match = gpt_faq_search(user_message)
-
+    
         if faq_match:
             bot_response = faq_match['answer']
             bot_response_html = faq_match['answer_html']
@@ -308,8 +309,8 @@ def chat():
             category = "一般對話"
             images = None
             related_options = []
-
-        # 儲存聊天記錄
+    
+        # 儲存聊天記錄到資料庫
         chat_record = ChatHistory(
             session_id=session_id,
             user_message=user_message,
@@ -318,7 +319,18 @@ def chat():
         )
         db.session.add(chat_record)
         db.session.commit()
-
+        
+        # 即時記錄到CSV檔案
+        ip_address = request.remote_addr
+        chat_logger.log_chat(
+            user_question=user_message,
+            bot_response=bot_response,
+            session_id=session_id,
+            ip_address=ip_address,
+            response_source=response_source,
+            category=category
+        )
+    
         return jsonify({
             'response': bot_response,
             'response_html': bot_response_html,
@@ -433,8 +445,8 @@ def get_chat_history():
 
 @app.route('/admin')
 def admin():
-    """管理介面"""
-    return render_template('admin.html')
+    """統一管理介面"""
+    return render_template('unified_admin.html')
 
 @app.route('/api/chat/clear', methods=['POST'])
 def clear_chat_history():
@@ -450,6 +462,88 @@ def clear_chat_history():
     except Exception as e:
         print('API /api/chat/clear 發生錯誤:', e)
         return jsonify({'error': '清空失敗'}), 500
+
+# 後台記錄管理API
+@app.route('/api/logs/statistics', methods=['GET'])
+def get_logs_statistics():
+    """獲取聊天記錄統計資料"""
+    try:
+        days = request.args.get('days', 30, type=int)
+        stats = chat_logger.get_statistics(days)
+        return jsonify(stats)
+    except Exception as e:
+        print('API /api/logs/statistics 發生錯誤:', e)
+        return jsonify({'error': '獲取統計資料失敗'}), 500
+
+@app.route('/api/logs/export', methods=['POST'])
+def export_logs():
+    """匯出聊天記錄到Excel"""
+    try:
+        data = request.get_json()
+        days = data.get('days', 30)
+        output_file = f'chat_logs_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        
+        exported_file = chat_logger.export_to_excel(output_file, days)
+        
+        return jsonify({
+            'message': '匯出成功',
+            'filename': exported_file,
+            'download_url': f'/api/logs/download/{os.path.basename(exported_file)}'
+        })
+    except Exception as e:
+        print('API /api/logs/export 發生錯誤:', e)
+        return jsonify({'error': '匯出失敗'}), 500
+
+@app.route('/api/logs/download/<filename>')
+def download_logs(filename):
+    """下載匯出的Excel檔案"""
+    try:
+        return send_from_directory('.', filename, as_attachment=True)
+    except Exception as e:
+        print('API /api/logs/download 發生錯誤:', e)
+        return jsonify({'error': '下載失敗'}), 500
+
+@app.route('/api/logs/import', methods=['POST'])
+def import_csv_to_db():
+    """將CSV記錄匯入資料庫"""
+    try:
+        imported_count = chat_logger.import_csv_to_db()
+        return jsonify({
+            'message': f'成功匯入 {imported_count} 筆記錄',
+            'imported_count': imported_count
+        })
+    except Exception as e:
+        print('API /api/logs/import 發生錯誤:', e)
+        return jsonify({'error': '匯入失敗'}), 500
+
+@app.route('/api/logs/unanswered', methods=['GET'])
+def get_unanswered_questions():
+    """獲取可能需要新增到FAQ的問題"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        unanswered = chat_logger.get_unanswered_questions(days)
+        return jsonify({
+            'unanswered_questions': unanswered,
+            'period': f'最近 {days} 天'
+        })
+    except Exception as e:
+        print('API /api/logs/unanswered 發生錯誤:', e)
+        return jsonify({'error': '獲取資料失敗'}), 500
+
+@app.route('/api/logs/cleanup', methods=['POST'])
+def cleanup_old_logs():
+    """清理舊記錄"""
+    try:
+        data = request.get_json()
+        days = data.get('days', 90)
+        deleted_count = chat_logger.cleanup_old_records(days)
+        return jsonify({
+            'message': f'成功清理 {deleted_count} 筆舊記錄',
+            'deleted_count': deleted_count
+        })
+    except Exception as e:
+        print('API /api/logs/cleanup 發生錯誤:', e)
+        return jsonify({'error': '清理失敗'}), 500
 
 # 新增：比對用正規化函式
 

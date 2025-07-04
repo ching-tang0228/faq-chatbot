@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統管理介面 - 安心臥照護系統FAQ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .back-link {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border: 1px solid white;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: white;
+            color: #4facfe;
+        }
+
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 100px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin: 0;
+        }
+
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #495057;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            background: #e9ecef;
+            color: #495057;
+            border-left-color: #007bff;
+        }
+
+        .sidebar-nav .nav-link.active {
+            background: #007bff;
+            color: white;
+            border-left-color: #0056b3;
+        }
+
+        .sidebar-nav .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .form-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .faq-list {
+            margin-top: 30px;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .faq-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .faq-category {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .faq-answer {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .faq-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .image-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+
+        .image-upload:hover {
+            border-color: #667eea;
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .upload-label {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .markdown-help {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .markdown-help h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .markdown-help ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .markdown-help li {
+            margin-bottom: 5px;
+        }
+
+        .markdown-help code {
+            background: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+
+        /* 統計卡片樣式 */
+        .stats-card {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-card .card-body {
+            padding: 20px;
+        }
+
+        .stats-card h5 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .stats-card h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .stats-card small {
+            opacity: 0.8;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .sidebar-nav {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+
+            .sidebar-nav li {
+                flex-shrink: 0;
+            }
+
+            .sidebar-nav .nav-link {
+                padding: 8px 15px;
+                white-space: nowrap;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .back-link {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+        }
+
+        /* 載入動畫 */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading i {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        /* 警告訊息樣式 */
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* 列表群組樣式 */
+        .list-group-item {
+            border: none;
+            border-bottom: 1px solid #e9ecef;
+            padding: 12px 0;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        /* 徽章樣式 */
+        .badge {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="header">
+            <a href="/" class="back-link">← 返回聊天</a>
+            <h1>🔧 系統管理介面</h1>
+            <p>FAQ管理與聊天記錄分析</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- 側邊欄導航 -->
+            <nav class="sidebar">
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="#" class="nav-link active" onclick="showSection('faq-management')">
+                            <i class="fas fa-edit"></i> FAQ管理
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" onclick="showSection('statistics')">
+                            <i class="fas fa-chart-line"></i> 統計儀表板
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" onclick="showSection('export')">
+                            <i class="fas fa-download"></i> 資料匯出
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" onclick="showSection('unanswered')">
+                            <i class="fas fa-question-circle"></i> 未回答問題
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" onclick="showSection('maintenance')">
+                            <i class="fas fa-tools"></i> 系統維護
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 主要內容區 -->
+            <main class="content-area">
+                <!-- FAQ管理區塊 -->
+                <div id="faq-management" class="content-section active">
+                    <h2 class="section-title">📚 FAQ管理</h2>
+                    
+                    <div class="form-section">
+                        <h3>➕ 新增 FAQ</h3>
+                        <form id="faqForm">
+                            <div class="form-group">
+                                <label for="question">問題：</label>
+                                <input type="text" id="question" class="form-control" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="answer">答案（支援 Markdown 格式）：</label>
+                                <textarea id="answer" class="form-control" required></textarea>
+                                <div class="markdown-help">
+                                    <h4>📝 Markdown 格式說明：</h4>
+                                    <ul>
+                                        <li><strong>粗體文字</strong>：使用 <code>**文字**</code></li>
+                                        <li><em>斜體文字</em>：使用 <code>*文字*</code></li>
+                                        <li>標題：使用 <code># 標題</code>、<code>## 子標題</code></li>
+                                        <li>列表：使用 <code>- 項目</code> 或 <code>1. 項目</code></li>
+                                        <li>圖片：使用 <code>![說明](圖片路徑)</code></li>
+                                        <li>連結：使用 <code>[文字](網址)</code></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="category">分類：</label>
+                                <input type="text" id="category" class="form-control" value="一般" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="keywords">關鍵字（用逗號分隔）：</label>
+                                <input type="text" id="keywords" class="form-control" placeholder="例如：照護, 產品, 使用說明">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>圖片上傳：</label>
+                                <div class="image-upload">
+                                    <input type="file" id="imageUpload" accept="image/*" multiple>
+                                    <label for="imageUpload" class="upload-label">
+                                        📷 點擊上傳圖片（可多選）
+                                    </label>
+                                    <p style="margin-top: 10px; color: #666; font-size: 14px;">
+                                        支援 JPG、PNG、GIF 格式，最大 16MB
+                                    </p>
+                                </div>
+                                <div class="image-preview" id="imagePreview"></div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">新增 FAQ</button>
+                        </form>
+                    </div>
+                    
+                    <div class="faq-list">
+                        <h3>📋 現有 FAQ 列表</h3>
+                        <div id="faqList">
+                            <div class="loading">
+                                <i class="fas fa-spinner fa-spin"></i> 載入中...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 統計儀表板區塊 -->
+                <div id="statistics" class="content-section">
+                    <h2 class="section-title">📊 統計儀表板</h2>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">總對話數</h5>
+                                    <h2 id="total-chats">-</h2>
+                                    <small id="period-text">最近30天</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">FAQ命中率</h5>
+                                    <h2 id="faq-hit-rate">-</h2>
+                                    <small>FAQ資料庫回答</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">GPT回答</h5>
+                                    <h2 id="gpt-responses">-</h2>
+                                    <small>AI生成回答</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stats-card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">活躍會話</h5>
+                                    <h2 id="active-sessions">-</h2>
+                                    <small>獨立使用者</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>常見問題 Top 10</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="common-questions-list" class="list-group list-group-flush">
+                                        <!-- 動態載入 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>分類統計</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="category-stats-list" class="list-group list-group-flush">
+                                        <!-- 動態載入 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 資料匯出區塊 -->
+                <div id="export" class="content-section">
+                    <h2 class="section-title">📄 資料匯出</h2>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>匯出聊天記錄</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="export-form">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="export-days" class="form-label">匯出天數</label>
+                                        <select class="form-select" id="export-days">
+                                            <option value="7">最近7天</option>
+                                            <option value="30" selected>最近30天</option>
+                                            <option value="90">最近90天</option>
+                                            <option value="365">最近一年</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-download"></i> 匯出Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div id="export-result" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 未回答問題區塊 -->
+                <div id="unanswered" class="content-section">
+                    <h2 class="section-title">❓ 未回答問題</h2>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>可能需要新增到FAQ的問題</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="unanswered-days" class="form-label">查詢天數</label>
+                                <select class="form-select" id="unanswered-days" style="width: 200px;">
+                                    <option value="3">最近3天</option>
+                                    <option value="7" selected>最近7天</option>
+                                    <option value="14">最近14天</option>
+                                </select>
+                            </div>
+                            <div id="unanswered-list">
+                                <!-- 動態載入 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系統維護區塊 -->
+                <div id="maintenance" class="content-section">
+                    <h2 class="section-title">⚙️ 系統維護</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>資料整理</h5>
+                                </div>
+                                <div class="card-body">
+                                    <button class="btn btn-warning mb-3" onclick="importCsvToDb()">
+                                        <i class="fas fa-upload"></i> 匯入CSV到資料庫
+                                    </button>
+                                    <div id="import-result"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>清理舊記錄</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="cleanup-days" class="form-label">清理天數</label>
+                                        <select class="form-select" id="cleanup-days">
+                                            <option value="30">30天前</option>
+                                            <option value="60">60天前</option>
+                                            <option value="90" selected>90天前</option>
+                                            <option value="180">180天前</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-danger" onclick="cleanupOldLogs()">
+                                        <i class="fas fa-trash"></i> 清理舊記錄
+                                    </button>
+                                    <div id="cleanup-result" class="mt-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全域變數
+        let uploadedImages = [];
+        let currentStats = null;
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFAQs();
+            loadStatistics();
+        });
+
+        // 顯示不同區段
+        function showSection(sectionName) {
+            // 隱藏所有區段
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 顯示選中的區段
+            document.getElementById(sectionName).classList.add('active');
+            
+            // 更新導航狀態
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 根據區段載入資料
+            if (sectionName === 'statistics') {
+                loadStatistics();
+            } else if (sectionName === 'unanswered') {
+                loadUnansweredQuestions();
+            }
+        }
+
+        // FAQ管理功能
+        function loadFAQs() {
+            const faqList = document.getElementById('faqList');
+            faqList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>';
+            
+            fetch('/api/faq')
+                .then(response => response.json())
+                .then(faqs => {
+                    if (faqs.length === 0) {
+                        faqList.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">目前沒有 FAQ</p>';
+                        return;
+                    }
+                    
+                    faqList.innerHTML = '';
+                    faqs.forEach(faq => {
+                        const faqDiv = document.createElement('div');
+                        faqDiv.className = 'faq-item';
+                        faqDiv.innerHTML = `
+                            <div class="faq-header">
+                                <div class="faq-question">${faq.question}</div>
+                                <div class="faq-category">${faq.category}</div>
+                            </div>
+                            <div class="faq-answer">${faq.answer}</div>
+                            <div class="faq-actions">
+                                <button class="btn btn-danger" onclick="deleteFAQ(${faq.id})">刪除</button>
+                            </div>
+                        `;
+                        faqList.appendChild(faqDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('載入 FAQ 失敗:', error);
+                    faqList.innerHTML = '<p style="text-align: center; color: #dc3545; padding: 40px;">載入失敗</p>';
+                });
+        }
+
+        function deleteFAQ(id) {
+            if (!confirm('確定要刪除這個 FAQ 嗎？')) return;
+            
+            fetch(`/api/faq/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showAlert('FAQ 刪除成功！', 'success');
+                loadFAQs();
+            })
+            .catch(error => {
+                console.error('刪除失敗:', error);
+                showAlert('刪除失敗，請稍後再試', 'error');
+            });
+        }
+
+        // 圖片上傳處理
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            
+            files.forEach(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('圖片上傳失敗：' + data.error, 'error');
+                    } else {
+                        uploadedImages.push(data.url);
+                        updateImagePreview();
+                        showAlert('圖片上傳成功！', 'success');
+                    }
+                })
+                .catch(error => {
+                    console.error('上傳失敗:', error);
+                    showAlert('圖片上傳失敗，請稍後再試', 'error');
+                });
+            });
+        });
+
+        function updateImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            uploadedImages.forEach((imageUrl, index) => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-item';
+                imageDiv.innerHTML = `
+                    <img src="${imageUrl}" alt="上傳的圖片">
+                    <button class="image-remove" onclick="removeImage(${index})">×</button>
+                `;
+                preview.appendChild(imageDiv);
+            });
+        }
+
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        // FAQ表單提交
+        document.getElementById('faqForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                question: document.getElementById('question').value,
+                answer: document.getElementById('answer').value,
+                category: document.getElementById('category').value,
+                keywords: document.getElementById('keywords').value,
+                images: JSON.stringify(uploadedImages)
+            };
+            
+            fetch('/api/faq', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showAlert('新增失敗：' + data.error, 'error');
+                } else {
+                    showAlert('FAQ 新增成功！', 'success');
+                    document.getElementById('faqForm').reset();
+                    uploadedImages = [];
+                    updateImagePreview();
+                    loadFAQs();
+                }
+            })
+            .catch(error => {
+                console.error('新增失敗:', error);
+                showAlert('新增失敗，請稍後再試', 'error');
+            });
+        });
+
+        // 統計功能
+        async function loadStatistics() {
+            try {
+                const response = await fetch('/api/logs/statistics?days=30');
+                const stats = await response.json();
+                currentStats = stats;
+                displayStatistics(stats);
+            } catch (error) {
+                console.error('載入統計資料失敗:', error);
+                showAlert('載入統計資料失敗', 'error');
+            }
+        }
+
+        function displayStatistics(stats) {
+            // 更新基本統計
+            document.getElementById('total-chats').textContent = stats.total_chats;
+            document.getElementById('period-text').textContent = stats.period;
+            
+            // 計算FAQ命中率
+            const faqCount = stats.source_stats.find(s => s[0] === 'FAQ資料庫')?.[1] || 0;
+            const gptCount = stats.source_stats.find(s => s[0] === 'GPT AI')?.[1] || 0;
+            const total = faqCount + gptCount;
+            const hitRate = total > 0 ? Math.round((faqCount / total) * 100) : 0;
+            
+            document.getElementById('faq-hit-rate').textContent = hitRate + '%';
+            document.getElementById('gpt-responses').textContent = gptCount;
+            document.getElementById('active-sessions').textContent = stats.total_chats;
+            
+            // 顯示常見問題
+            const commonQuestionsList = document.getElementById('common-questions-list');
+            commonQuestionsList.innerHTML = '';
+            stats.common_questions.forEach((item, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.innerHTML = `
+                    <div>
+                        <strong>${index + 1}.</strong> ${item[0].substring(0, 50)}${item[0].length > 50 ? '...' : ''}
+                    </div>
+                    <span class="badge bg-primary rounded-pill">${item[1]}</span>
+                `;
+                commonQuestionsList.appendChild(listItem);
+            });
+            
+            // 顯示分類統計
+            const categoryStatsList = document.getElementById('category-stats-list');
+            categoryStatsList.innerHTML = '';
+            stats.category_stats.forEach(item => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                listItem.innerHTML = `
+                    <div>${item[0]}</div>
+                    <span class="badge bg-success rounded-pill">${item[1]}</span>
+                `;
+                categoryStatsList.appendChild(listItem);
+            });
+        }
+
+        // 匯出功能
+        document.getElementById('export-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const days = document.getElementById('export-days').value;
+            const resultDiv = document.getElementById('export-result');
+            
+            resultDiv.innerHTML = '<div class="alert alert-info">正在匯出，請稍候...</div>';
+            
+            try {
+                const response = await fetch('/api/logs/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ days: parseInt(days) })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            ${result.message}
+                            <a href="${result.download_url}" class="btn btn-sm btn-success ms-2">
+                                <i class="fas fa-download"></i> 下載檔案
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('匯出失敗:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">匯出失敗</div>';
+            }
+        });
+
+        // 未回答問題功能
+        async function loadUnansweredQuestions() {
+            const days = document.getElementById('unanswered-days').value;
+            const listDiv = document.getElementById('unanswered-list');
+            
+            listDiv.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> 載入中...</div>';
+            
+            try {
+                const response = await fetch(`/api/logs/unanswered?days=${days}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.unanswered_questions.length === 0) {
+                        listDiv.innerHTML = '<div class="alert alert-info">沒有找到需要新增到FAQ的問題</div>';
+                    } else {
+                        let html = `<h6>${data.period}內重複詢問的問題：</h6>`;
+                        data.unanswered_questions.forEach((item, index) => {
+                            html += `
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <h6 class="card-title">${index + 1}. ${item[0]}</h6>
+                                        <p class="card-text text-muted">詢問次數：${item[1]}</p>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        listDiv.innerHTML = html;
+                    }
+                } else {
+                    listDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                }
+            } catch (error) {
+                console.error('載入未回答問題失敗:', error);
+                listDiv.innerHTML = '<div class="alert alert-danger">載入失敗</div>';
+            }
+        }
+
+        // 維護功能
+        async function importCsvToDb() {
+            const resultDiv = document.getElementById('import-result');
+            resultDiv.innerHTML = '<div class="alert alert-info">正在匯入，請稍候...</div>';
+            
+            try {
+                const response = await fetch('/api/logs/import', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+                    loadStatistics();
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('匯入失敗:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">匯入失敗</div>';
+            }
+        }
+
+        async function cleanupOldLogs() {
+            if (!confirm('確定要清理舊記錄嗎？此操作無法復原。')) {
+                return;
+            }
+            
+            const days = document.getElementById('cleanup-days').value;
+            const resultDiv = document.getElementById('cleanup-result');
+            resultDiv.innerHTML = '<div class="alert alert-info">正在清理，請稍候...</div>';
+            
+            try {
+                const response = await fetch('/api/logs/cleanup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ days: parseInt(days) })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="alert alert-success">${result.message}</div>`;
+                    loadStatistics();
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${result.error}</div>`;
+                }
+            } catch (error) {
+                console.error('清理失敗:', error);
+                resultDiv.innerHTML = '<div class="alert alert-danger">清理失敗</div>';
+            }
+        }
+
+        // 工具函數
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // 插入到頁面頂部
+            const contentArea = document.querySelector('.content-area');
+            contentArea.insertBefore(alertDiv, contentArea.firstChild);
+            
+            // 3秒後自動消失
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+
+        // 監聽未回答問題天數變更
+        document.getElementById('unanswered-days').addEventListener('change', loadUnansweredQuestions);
+    </script>
+</body>
+</html> 
